@@ -1,0 +1,44 @@
+service: s3-demo
+
+custom:
+   writeEnvVars:
+      BUCKET_NAME: mole-testing-bucket
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+functions:
+  hello:
+    description: Detect upload to S3
+    memorySize: 1024
+    timeout: 30
+    handler: functions/s3DetectUpload/handler.default
+    events:
+      - s3:
+          bucket: ${self:custom.writeEnvVars.BUCKET_NAME}
+          rules:
+            - prefix: uploads/
+            - suffix: jpg
+  cronJob:
+    description: Set up a cron job
+    memorySize: 1024
+    timeout: 30
+    handler: functions/cronJob/handler.default
+    events:
+      - schedule: cron(5 8 * * ? *)
+  restAPI:
+    description: Set up a RESTful API
+    memorySize: 1024
+    timeout: 30
+    handler: functions/restAPI/handler.default
+    events:
+      - http:
+          path: index
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    S3BucketTestingBucket:
+      Type: AWS::S3::Bucket

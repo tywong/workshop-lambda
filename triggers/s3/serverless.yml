@@ -1,0 +1,30 @@
+service: triggers-s3
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+functions:
+  s3DetectUpload:
+    description: Detect upload to S3
+    memorySize: 1024
+    timeout: 30
+    handler: handler.s3DetectUpload
+    events:
+      - s3:
+          bucket: mole-workshop-bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploads/
+            - suffix: .jpg
+      - s3:
+          bucket: mole-workshop-bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploads/
+            - suffix: .png
+
+resources:
+  Resources:
+    S3BucketTestingBucket:
+      Type: AWS::S3::Bucket
