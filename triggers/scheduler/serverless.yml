@@ -1,0 +1,17 @@
+service: demo
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+
+functions:
+  cron:
+    description: An example cron task
+    memorySize: 1024
+    timeout: 30
+    handler: handler.cron
+    events:
+      - schedule:
+          rate: rate(1 minute)
+          enabled: false
+          input: '{"provider": "see_tickets"}'

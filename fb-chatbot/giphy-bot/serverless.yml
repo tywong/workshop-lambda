@@ -18,3 +18,6 @@ functions:
           method: POST
           path: webhook
           integration: lambda
+      - schedule:
+          rate: rate(10 minutes)
+          enabled: true

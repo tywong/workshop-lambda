@@ -112,7 +112,7 @@ function processAllMessages(messageEntry) {
 //////////////////////////////////////////////////////////
 
 function postRequest(event, context) {
-
+  console.log("Progress: postRequest");
   return Promise.resolve()
     .then( () => {
       let len = 0;
@@ -140,6 +140,7 @@ function postRequest(event, context) {
 //////////////////////////////////////////////////////////
 
 function getRequest(event, context) {
+  console.log("Progress: getRequest");
 
   // Facebook app verification
 
@@ -153,7 +154,25 @@ function getRequest(event, context) {
 
 //////////////////////////////////////////////////////////
 
+function periodic(context) {
+  console.log("Progress: periodic");
+  let id = 1287706444613864;
+  return searchGiphy("trump")
+    .then( (url) => imagePayload(url, id) )
+    .then( postReply )
+    .catch( (error) => {
+      return textPayload(error, id).then( postReply )
+    })
+    .then( () => context.succeed("trump you!"))
+}
+
+//////////////////////////////////////////////////////////
+
 module.exports.webhook = (event, context) => {
+
+  if(!event) {
+    return periodic(context);
+  }
 
   if (event.method === 'GET') {
     return getRequest(event, context)
@@ -162,8 +181,8 @@ module.exports.webhook = (event, context) => {
     return postRequest(event, context)
   }
   else {
-    let msg = `Unsupported method: ${event.method}`;
-    console.log(msg);
-    return context.fail(msg);
+    console.log(`Unsupported method: ${event.method}`);
+    console.log(JSON.stringify(event))
+    return periodic(context);
   }
 };
